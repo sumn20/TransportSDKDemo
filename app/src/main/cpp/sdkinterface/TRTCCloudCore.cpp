@@ -23,22 +23,28 @@ void TRTCCloudCore::Destroy() {
 
 TRTCCloudCore::TRTCCloudCore() {
     LOGCATI("TRTCCloudCore()");
-    m_pCloud = TRTCCloud::Create(this);
+    liteav::InitParams init_params;
+    TRTCCloud::Initialize(init_params);
+    pCloud = TRTCCloud::Create(this);
+    pCameraPreview = new CameraPreview();
+
 
 }
 
 TRTCCloudCore::~TRTCCloudCore() {
     LOGCATI("~TRTCCloudCore()");
-    TRTCCloud::Destroy(m_pCloud);
-    m_pCloud = nullptr;
-    delete m_pDecoder;
-    m_pDecoder = nullptr;
-    delete m_pAudioPlayer;
-    m_pAudioPlayer = nullptr;
+    TRTCCloud::Destroy(pCloud);
+    pCloud = nullptr;
+    delete pDecoder;
+    pDecoder = nullptr;
+    delete pAudioPlayer;
+    pAudioPlayer = nullptr;
+    delete pCameraPreview;
+    pCameraPreview = nullptr;
 }
 
 TRTCCloud *TRTCCloudCore::getTRTCCloud() {
-    return m_pCloud;
+    return pCloud;
 }
 
 void TRTCCloudCore::OnError(Error error) {
@@ -96,7 +102,7 @@ void TRTCCloudCore::OnRemoteVideoAvailable(const char *user_id, bool available, 
 
 void TRTCCloudCore::OnRemoteVideoReceived(const char *user_id, StreamType type,
                                           const VideoFrame &frame) {
-    m_pDecoder->decode_video(frame.data(), frame.size(), frame.pts, frame.dts);
+    pDecoder->decode_video(frame.data(), frame.size(), frame.pts, frame.dts);
 
 }
 
@@ -110,12 +116,26 @@ void TRTCCloudCore::OnRemoteAudioReceived(const char *user_id, const AudioFrame 
 }
 
 void TRTCCloudCore::OnRemoteMixedAudioReceived(const AudioFrame &frame) {
-    m_pAudioPlayer->Play(frame.data(), frame.size());
+    pAudioPlayer->Play(frame.data(), frame.size());
 
 }
 
 void TRTCCloudCore::createDecoder(ANativeWindow *nwin) {
-    m_pDecoder = new FFmpegVideoDecoder(nwin);
-    m_pAudioPlayer = new OpenSLPlayer();
+    pDecoder = new FFmpegVideoDecoder(nwin);
+    pAudioPlayer = new OpenSLPlayer();
+}
+
+void TRTCCloudCore::startPreview(ANativeWindow *window) {
+    pCameraPreview->startPreview(window);
+    pCameraPreview->setVideoDataListener(this);
+}
+
+void TRTCCloudCore::stopPreview() {
+    pCameraPreview->stopPreview();
+}
+
+void TRTCCloudCore::actionVideoData(VideoFrame frame) {
+    pCloud->SendVideoFrame(STREAM_TYPE_VIDEO_HIGH, frame);
+
 }
 

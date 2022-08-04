@@ -41,7 +41,7 @@
  * SwrContext. This can be done with swr_alloc() or swr_alloc_set_opts(). If you
  * are using the former, you must set options through the @ref avoptions API.
  * The latter function provides the same feature, but it allows you to set some
- * recorder.common options in the same statement.
+ * common options in the same statement.
  *
  * For example the following code will setup conversion from planar float sample
  * format to interleaved signed 16-bit integer, downsampling from 48kHz to
@@ -228,7 +228,7 @@ int swr_init(struct SwrContext *s);
 int swr_is_initialized(struct SwrContext *s);
 
 /**
- * Allocate SwrContext if needed and set/reset recorder.common parameters.
+ * Allocate SwrContext if needed and set/reset common parameters.
  *
  * This function does not require s to be allocated with swr_alloc(). On the
  * other hand, swr_alloc() can use swr_alloc_set_opts() to set the parameters
@@ -285,7 +285,7 @@ void swr_close(struct SwrContext *s);
  * @{
  */
 
-/** Convert recorder.audio.
+/** Convert audio.
  *
  * in and in_count can be set to 0 to flush the last few samples out at the
  * end.
@@ -296,9 +296,9 @@ void swr_close(struct SwrContext *s);
  * input samples. Conversion will run directly without copying whenever possible.
  *
  * @param s         allocated Swr context, with parameters set
- * @param out       output buffers, only the first one need be set in case of packed recorder.audio
+ * @param out       output buffers, only the first one need be set in case of packed audio
  * @param out_count amount of space available for output in samples per channel
- * @param in        input buffers, only the first one need to be set in case of packed recorder.audio
+ * @param in        input buffers, only the first one need to be set in case of packed audio
  * @param in_count  number of input samples available in one channel
  *
  * @return number of samples output per channel, negative value on error
@@ -455,7 +455,7 @@ int swr_inject_silence(struct SwrContext *s, int count);
  *                  delay is in input samples
  *              @li if it's set to the output sample rate then the returned
  *                  delay is in output samples
- *              @li if it's the least recorder.common multiple of in_sample_rate and
+ *              @li if it's the least common multiple of in_sample_rate and
  *                  out_sample_rate then an exact rounding-free delay will be
  *                  returned
  * @returns     the delay in 1 / @c base units.
@@ -546,7 +546,7 @@ const char *swresample_license(void);
  * @see swr_convert()
  * @see swr_get_delay()
  *
- * @param swr             recorder.audio resample context
+ * @param swr             audio resample context
  * @param output          output AVFrame
  * @param input           input AVFrame
  * @return                0 on success, AVERROR on failure or nonmatching
@@ -564,7 +564,7 @@ int swr_convert_frame(SwrContext *swr,
  *
  * @see swr_close();
  *
- * @param swr             recorder.audio resample context
+ * @param swr             audio resample context
  * @param output          output AVFrame
  * @param input           input AVFrame
  * @return                0 on success, AVERROR on failure.

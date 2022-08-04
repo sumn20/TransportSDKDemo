@@ -18,6 +18,9 @@ public class TRTCManager {
     public static native void enterRoom(int roomID, String userID, Surface surface);
     public static native void exitRoom();
 
+    public static native void startPreview(Surface surface);
+    public static native void stopPreview();
+
 
 
 }

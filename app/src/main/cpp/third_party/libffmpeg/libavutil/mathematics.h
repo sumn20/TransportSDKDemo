@@ -109,7 +109,7 @@ enum AVRounding {
 };
 
 /**
- * Compute the greatest recorder.common divisor of two integer operands.
+ * Compute the greatest common divisor of two integer operands.
  *
  * @param a,b Operands
  * @return GCD of a and b up to sign; if a >= 0 and b >= 0, return value is >= 0;
@@ -176,7 +176,7 @@ int64_t av_rescale_q_rnd(int64_t a, AVRational bq, AVRational cq,
 int av_compare_ts(int64_t ts_a, AVRational tb_a, int64_t ts_b, AVRational tb_b);
 
 /**
- * Compare the remainders of two integer operands divided by a recorder.common divisor.
+ * Compare the remainders of two integer operands divided by a common divisor.
  *
  * In other words, compare the least significant `log2(mod)` bits of integers
  * `a` and `b`.
@@ -198,7 +198,7 @@ int64_t av_compare_mod(uint64_t a, uint64_t b, uint64_t mod);
 /**
  * Rescale a timestamp while preserving known durations.
  *
- * This function is designed to be called per recorder.audio packet to scale the input
+ * This function is designed to be called per audio packet to scale the input
  * timestamp to a different time base. Compared to a simple av_rescale_q()
  * call, this function is robust against possible inconsistent frame durations.
  *

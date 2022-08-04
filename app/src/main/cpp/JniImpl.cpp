@@ -30,13 +30,15 @@ Java_com_tencent_transportsdkdemo_TRTCManager_enterRoom(JNIEnv *env, jclass claz
     params.room_id = room_id;
     char sig[1024] = {0};
     size_t sig_size = 1024;
-    GenerateUserSig(SDKAPPID, kSdkDemoKey, params.user_id,sig, &sig_size);
+    GenerateUserSig(SDKAPPID, kSdkDemoKey, params.user_id, sig, &sig_size);
     params.user_sig = sig;
     params.scene = TRTC_SCENE_RECORD;
     params.role = TRTC_ROLE_ANCHOR;
     params.record_config = recordConfig;
-    ANativeWindow *nwin = ANativeWindow_fromSurface(env, surface);
-    TRTCCloudCore::GetInstance()->createDecoder(nwin);
+    if (surface){
+        ANativeWindow *nwin = ANativeWindow_fromSurface(env, surface);
+        TRTCCloudCore::GetInstance()->createDecoder(nwin);
+    }
     TRTCCloudCore::GetInstance()->getTRTCCloud()->EnterRoom(params);
     env->ReleaseStringUTFChars(user_id, userId);
 }
@@ -45,7 +47,19 @@ Java_com_tencent_transportsdkdemo_TRTCManager_exitRoom(JNIEnv *env, jclass clazz
     TRTCCloudCore::GetInstance()->getTRTCCloud()->ExitRoom();
     TRTCCloudCore::Destroy();
 }
+JNIEXPORT void JNICALL
+Java_com_tencent_transportsdkdemo_TRTCManager_startPreview(JNIEnv *env, jclass clazz,
+                                                           jobject surface) {
+    TRTCCloudCore::GetInstance()->getTRTCCloud()->CreateLocalVideoChannel(STREAM_TYPE_VIDEO_HIGH);
+    ANativeWindow *nwin = ANativeWindow_fromSurface(env, surface);
+    TRTCCloudCore::GetInstance()->startPreview(nwin);
 
+
+}
+JNIEXPORT void JNICALL
+Java_com_tencent_transportsdkdemo_TRTCManager_stopPreview(JNIEnv *env, jclass clazz) {
+    TRTCCloudCore::GetInstance()->stopPreview();
+}
 #ifdef __cplusplus
 }
 #endif

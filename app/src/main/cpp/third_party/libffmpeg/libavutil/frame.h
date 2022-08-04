@@ -107,7 +107,7 @@ enum AVFrameSideDataType {
      */
     AV_FRAME_DATA_SKIP_SAMPLES,
     /**
-     * This side data must be associated with an recorder.audio frame and corresponds to
+     * This side data must be associated with an audio frame and corresponds to
      * enum AVAudioServiceType defined in avcodec.h.
      */
     AV_FRAME_DATA_AUDIO_SERVICE_TYPE,
@@ -162,8 +162,8 @@ enum AVFrameSideDataType {
     /**
      * Timecode which conforms to SMPTE ST 12-1. The data is an array of 4 uint32_t
      * where the first uint32_t describes how many (1-3) of the other timecodes are used.
-     * The timecode format is described in the documentation of av_timecode_get_smpte_from_framenum()
-     * function in libavutil/timecode.h.
+     * The timecode format is described in the av_timecode_get_smpte_from_framenum()
+     * function in libavutil/timecode.c.
      */
     AV_FRAME_DATA_S12M_TIMECODE,
 
@@ -179,25 +179,6 @@ enum AVFrameSideDataType {
      * array element is implied by AVFrameSideData.size / AVRegionOfInterest.self_size.
      */
     AV_FRAME_DATA_REGIONS_OF_INTEREST,
-
-    /**
-     * Encoding parameters for a video frame, as described by AVVideoEncParams.
-     */
-    AV_FRAME_DATA_VIDEO_ENC_PARAMS,
-
-    /**
-     * User data unregistered metadata associated with a video frame.
-     * This is the H.26[45] UDU SEI message, and shouldn't be used for any other purpose
-     * The data is stored as uint8_t in AVFrameSideData.data which is 16 bytes of
-     * uuid_iso_iec_11578 followed by AVFrameSideData.size - 16 bytes of user_data_payload_byte.
-     */
-    AV_FRAME_DATA_SEI_UNREGISTERED,
-
-    /**
-     * Film grain parameters for a frame, described by AVFilmGrainParams.
-     * Must be present for every frame which should have film grain applied.
-     */
-    AV_FRAME_DATA_FILM_GRAIN_PARAMS,
 };
 
 enum AVActiveFormatDescription {
@@ -220,11 +201,7 @@ enum AVActiveFormatDescription {
 typedef struct AVFrameSideData {
     enum AVFrameSideDataType type;
     uint8_t *data;
-#if FF_API_BUFFER_SIZE_T
     int      size;
-#else
-    size_t   size;
-#endif
     AVDictionary *metadata;
     AVBufferRef *buf;
 } AVFrameSideData;
@@ -286,7 +263,7 @@ typedef struct AVRegionOfInterest {
 } AVRegionOfInterest;
 
 /**
- * This structure describes decoded (raw) recorder.audio or video data.
+ * This structure describes decoded (raw) audio or video data.
  *
  * AVFrame must be allocated using av_frame_alloc(). Note that this only
  * allocates the AVFrame itself, the buffers for the data must be managed
@@ -333,9 +310,9 @@ typedef struct AVFrame {
 
     /**
      * For video, size in bytes of each picture line.
-     * For recorder.audio, size in bytes of each plane.
+     * For audio, size in bytes of each plane.
      *
-     * For recorder.audio, only linesize[0] may be set. For planar recorder.audio, each channel
+     * For audio, only linesize[0] may be set. For planar audio, each channel
      * plane must be the same size.
      *
      * For video the linesizes should be multiples of the CPUs alignment
@@ -353,13 +330,13 @@ typedef struct AVFrame {
      *
      * For video, this should simply point to data[].
      *
-     * For planar recorder.audio, each channel has a separate data pointer, and
+     * For planar audio, each channel has a separate data pointer, and
      * linesize[0] contains the size of each channel buffer.
-     * For packed recorder.audio, there is just one data pointer, and linesize[0]
+     * For packed audio, there is just one data pointer, and linesize[0]
      * contains the total size of the buffer for all channels.
      *
      * Note: Both data and extended_data should always be set in a valid frame,
-     * but for planar recorder.audio with more channels that can fit in data,
+     * but for planar audio with more channels that can fit in data,
      * extended_data must be used in order to access all channels.
      */
     uint8_t **extended_data;
@@ -379,14 +356,14 @@ typedef struct AVFrame {
      */
 
     /**
-     * number of recorder.audio samples (per channel) described by this frame
+     * number of audio samples (per channel) described by this frame
      */
     int nb_samples;
 
     /**
      * format of the frame, -1 if unknown or unset
      * Values correspond to enum AVPixelFormat for video frames,
-     * enum AVSampleFormat for recorder.audio)
+     * enum AVSampleFormat for audio)
      */
     int format;
 
@@ -485,12 +462,12 @@ typedef struct AVFrame {
     int64_t reordered_opaque;
 
     /**
-     * Sample rate of the recorder.audio data.
+     * Sample rate of the audio data.
      */
     int sample_rate;
 
     /**
-     * Channel layout of the recorder.audio data.
+     * Channel layout of the audio data.
      */
     uint64_t channel_layout;
 
@@ -501,7 +478,7 @@ typedef struct AVFrame {
      * also be non-NULL for all j < i.
      *
      * There may be at most one AVBuffer per data plane, so for video this array
-     * always contains all the references. For planar recorder.audio with more than
+     * always contains all the references. For planar audio with more than
      * AV_NUM_DATA_POINTERS channels, there may be more buffers than can fit in
      * this array. Then the extra AVBufferRef pointers are stored in the
      * extended_buf array.
@@ -509,7 +486,7 @@ typedef struct AVFrame {
     AVBufferRef *buf[AV_NUM_DATA_POINTERS];
 
     /**
-     * For planar recorder.audio which requires more than AV_NUM_DATA_POINTERS
+     * For planar audio which requires more than AV_NUM_DATA_POINTERS
      * AVBufferRef pointers, this array will hold all the references which
      * cannot fit into AVFrame.buf.
      *
@@ -617,7 +594,7 @@ typedef struct AVFrame {
 #define FF_DECODE_ERROR_DECODE_SLICES       8
 
     /**
-     * number of recorder.audio channels, only used for recorder.audio.
+     * number of audio channels, only used for audio.
      * - encoding: unused
      * - decoding: Read by user.
      */
@@ -822,12 +799,12 @@ void av_frame_unref(AVFrame *frame);
 void av_frame_move_ref(AVFrame *dst, AVFrame *src);
 
 /**
- * Allocate new buffer(s) for recorder.audio or video data.
+ * Allocate new buffer(s) for audio or video data.
  *
  * The following fields must be set on frame before calling this function:
- * - format (pixel format for video, sample format for recorder.audio)
+ * - format (pixel format for video, sample format for audio)
  * - width and height for video
- * - nb_samples and channel_layout for recorder.audio
+ * - nb_samples and channel_layout for audio
  *
  * This function will fill AVFrame.data and AVFrame.buf arrays and, if
  * necessary, allocate and fill AVFrame.extended_data and AVFrame.extended_buf.
@@ -890,7 +867,7 @@ int av_frame_copy(AVFrame *dst, const AVFrame *src);
  * Copy only "metadata" fields from src to dst.
  *
  * Metadata for the purpose of this function are those fields that do not affect
- * the data layout in the buffers.  E.g. pts, sample rate (for recorder.audio) or sample
+ * the data layout in the buffers.  E.g. pts, sample rate (for audio) or sample
  * aspect ratio (for video), but not width/height or channel layout.
  * Side data is also copied.
  */
@@ -917,11 +894,7 @@ AVBufferRef *av_frame_get_plane_buffer(AVFrame *frame, int plane);
  */
 AVFrameSideData *av_frame_new_side_data(AVFrame *frame,
                                         enum AVFrameSideDataType type,
-#if FF_API_BUFFER_SIZE_T
                                         int size);
-#else
-                                        size_t size);
-#endif
 
 /**
  * Add a new side data to a frame from an existing AVBufferRef
@@ -947,7 +920,8 @@ AVFrameSideData *av_frame_get_side_data(const AVFrame *frame,
                                         enum AVFrameSideDataType type);
 
 /**
- * Remove and free all side data instances of the given type.
+ * If side data of the supplied type exists in the frame, free it and remove it
+ * from the frame.
  */
 void av_frame_remove_side_data(AVFrame *frame, enum AVFrameSideDataType type);
 

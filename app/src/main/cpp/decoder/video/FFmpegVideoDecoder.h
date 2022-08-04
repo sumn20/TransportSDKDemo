@@ -27,18 +27,16 @@ public:
 
     int decode_video(const uint8_t *data, size_t len, int pts, int dts);
 
-private:
-    int dumpYUV(AVFrame *frame, FILE *f);
 
 private:
-    AVCodec *codec = NULL;
-    AVCodecContext *avcodec_ctx = NULL;
+    AVCodec *pCodec = NULL;
+    AVCodecContext *pCodecCtx = NULL;
     AVPacket *pkt = NULL;
-    AVFrame *frame = NULL;
+    AVFrame *pFrame = NULL;
     // 解析器上下文
-    AVCodecParserContext *parser = NULL;
-    FILE *f_out = NULL;
-    OpenGlRender *glRender=NULL;
+    AVCodecParserContext *pCodecParserCtx = NULL;
+
+    OpenGlRender *pGlRender=NULL;
 
 };
 

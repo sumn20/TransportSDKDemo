@@ -4,21 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tencent.transportsdkdemo.capture.CameraActivity;
 import com.tencent.transportsdkdemo.databinding.ActivityMainBinding;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +29,13 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        binding.sdkVersion.setText(TRTCManager.getSDKVersion());
         binding.nativeSimple.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this,SimpleEnterActivity.class));
 
+        });
+        binding.camera.setOnClickListener(view -> {
+            startActivity(new Intent(MainActivity.this, CameraActivity.class));
         });
         checkPermission();
 

@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.18.1)
+set(CMAKE_VERBOSE_MAKEFILE on)
 project("transportsdkdemo")
 #头文件设置
 include_directories(
@@ -11,6 +12,11 @@ include_directories(
         sdkinterface
         decoder
         decoder/video
+        decoder/audio
+        capture
+        encode
+        encode/video
+        encode/audio
 )
 #业务代码设置
 file(GLOB src-files
@@ -23,14 +29,6 @@ add_library(
         SHARED
         ${src-files})
 
-
-
-find_library(
-        log-lib
-        log)
-find_library(
-        libz-lib
-        z)
 
 set(jnilibs "${CMAKE_SOURCE_DIR}/../jniLibs")
 add_library(avcodec SHARED IMPORTED)
@@ -55,14 +53,20 @@ set_target_properties(swresample PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDRO
 add_library(swscale SHARED IMPORTED)
 set_target_properties(swscale PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libswscale.so)
 
-add_library(trtc SHARED IMPORTED )
+add_library(postproc SHARED IMPORTED)
+set_target_properties(postproc PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libpostproc.so)
+
+add_library(trtc SHARED IMPORTED)
 set_target_properties(trtc PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libtrtc.so)
 
-add_library(ssl STATIC IMPORTED )
+add_library(ssl STATIC IMPORTED)
 set_target_properties(ssl PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libssl.a)
 
-add_library(crypto STATIC IMPORTED )
+add_library(crypto STATIC IMPORTED)
 set_target_properties(crypto PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libcrypto.a)
+
+add_library(x264 STATIC IMPORTED)
+set_target_properties(x264 PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libx264.a)
 
 
 set(third-party-libs
@@ -73,6 +77,8 @@ set(third-party-libs
         avutil
         swresample
         swscale
+        postproc
+        x264
         ssl
         crypto
         trtc
@@ -81,12 +87,17 @@ set(third-party-libs
 
 target_link_libraries(
         transportsdkdemo
-        ${log-lib}
-        ${libz-lib}
         ${third-party-libs}
+        log
+        #zlib
+        z
+        #数学函数动态库
+        m
         OpenSLES
         EGL
         GLESv2
         android
         atomic
+        camera2ndk
+        mediandk
 )

@@ -5,18 +5,21 @@
 #ifndef TRANSPORTSDKDEMO_TRTCCLOUDCORE_H
 #define TRANSPORTSDKDEMO_TRTCCLOUDCORE_H
 
+#include <VideoDataListener.h>
 #include "trtc_cloud.h"
 #include "FFmpegVideoDecoder.h"
 #include "audio/OpenSLPlayer.h"
+#include "camera_preview.h"
 
 using namespace liteav;
 
-class TRTCCloudCore : public TRTCCloudDelegate {
+class TRTCCloudCore : public TRTCCloudDelegate,VideoDataListener {
 private:
     static TRTCCloudCore* m_instance;
-    TRTCCloud* m_pCloud = nullptr;
-    FFmpegVideoDecoder* m_pDecoder;
-    OpenSLPlayer* m_pAudioPlayer;
+    TRTCCloud* pCloud = nullptr;
+    FFmpegVideoDecoder* pDecoder;
+    OpenSLPlayer* pAudioPlayer;
+    CameraPreview* pCameraPreview;
 
 public:
     static TRTCCloudCore* GetInstance();
@@ -27,6 +30,10 @@ public:
     TRTCCloud*  getTRTCCloud();
 
     void createDecoder(ANativeWindow *nwin);
+
+    void startPreview(ANativeWindow *window);
+    void stopPreview();
+    virtual void actionVideoData(VideoFrame frame);
 public:
     // SDK 内部不可恢复错误通知，需要 App 干预或提示用户。
     virtual void OnError(Error error);
