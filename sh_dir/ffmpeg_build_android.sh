@@ -15,35 +15,36 @@ export PREFIX=$(pwd)/android/$CPU
 export MIN_PLATFORM=$NDK/platforms/android-$MIN
 export SYSROOT=$NDK/sysroot
 export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$HOST_TAG
-#armv7-a配置
-#export AR=$TOOLCHAIN/bin/arm-linux-androideabi-ar
-#export AS=$TOOLCHAIN/bin/arm-linux-androideabi-as
-#export CC=$TOOLCHAIN/bin/$ARCH-linux-androideabi$MIN-clang
-#echo "-----------------------------"
-#echo $CC
-#export CXX=$TOOLCHAIN/bin/$ARCH-linux-androideabi$MIN-clang++
-#export LD=$TOOLCHAIN/bin/arm-linux-androideabi-ld
-#export NM=$TOOLCHAIN/bin/arm-linux-androideabi-nm
-#export RANLIB=$TOOLCHAIN/bin/arm-linux-androideabi-ranlib
-#export STRIP=$TOOLCHAIN/bin/arm-linux-androideabi-strip
-#OPTIMIZE_CFLAGS="-I/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm/include -DANDROID -I$NDK/sysroot/usr/include/arm-linux-androideabi/"
-#ADDI_LDFLAGS="-Wl,-rpath-link=$MIN_PLATFORM/arch-arm/usr/lib -L/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm/lib -L$MIN_PLATFORM/arch-arm/usr/lib -nostdlib"
-
-#armv8-a配置
-export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
-export AS=$TOOLCHAIN/bin/aarch64-linux-android-as
-export CC=$TOOLCHAIN/bin/$ARCH-linux-android$MIN-clang
-echo "-----------------------------"
-echo $CC
-export CXX=$TOOLCHAIN/bin/$ARCH-linux-android$MIN-clang++
-export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
-export NM=$TOOLCHAIN/bin/aarch64-linux-android-nm
-export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
-export STRIP=$TOOLCHAIN/bin/aarch64-linux-androideabi-strip
-
-OPTIMIZE_CFLAGS="-I/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm64/include -DANDROID -I$NDK/sysroot/usr/include/arm64-linux-android/"
-ADDI_LDFLAGS="-Wl,-rpath-link=$MIN_PLATFORM/arch-arm64/usr/lib -L/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm64/lib -L$MIN_PLATFORM/arch-arm64/usr/lib -nostdlib"
-
+if [ "$ARCH" = "armv7a" ]
+then
+  #armv7-a配置
+  export AR=$TOOLCHAIN/bin/arm-linux-androideabi-ar
+  export AS=$TOOLCHAIN/bin/arm-linux-androideabi-as
+  export CC=$TOOLCHAIN/bin/$ARCH-linux-androideabi$MIN-clang
+  echo "-----------------------------"
+  echo $CC
+  export CXX=$TOOLCHAIN/bin/$ARCH-linux-androideabi$MIN-clang++
+  export LD=$TOOLCHAIN/bin/arm-linux-androideabi-ld
+  export NM=$TOOLCHAIN/bin/arm-linux-androideabi-nm
+  export RANLIB=$TOOLCHAIN/bin/arm-linux-androideabi-ranlib
+  export STRIP=$TOOLCHAIN/bin/arm-linux-androideabi-strip
+  OPTIMIZE_CFLAGS="-I/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm/include -DANDROID -I$NDK/sysroot/usr/include/arm-linux-androideabi/"
+  ADDI_LDFLAGS="-Wl,-rpath-link=$MIN_PLATFORM/arch-arm/usr/lib -L/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm/lib -L$MIN_PLATFORM/arch-arm/usr/lib -nostdlib"
+else
+  #armv8-a配置
+  export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
+  export AS=$TOOLCHAIN/bin/aarch64-linux-android-as
+  export CC=$TOOLCHAIN/bin/$ARCH-linux-android$MIN-clang
+  echo "-----------------------------"
+  echo $CC
+  export CXX=$TOOLCHAIN/bin/$ARCH-linux-android$MIN-clang++
+  export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
+  export NM=$TOOLCHAIN/bin/aarch64-linux-android-nm
+  export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
+  export STRIP=$TOOLCHAIN/bin/aarch64-linux-androideabi-strip
+  OPTIMIZE_CFLAGS="-I/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm64/include -DANDROID -I$NDK/sysroot/usr/include/arm64-linux-android/"
+  ADDI_LDFLAGS="-Wl,-rpath-link=$MIN_PLATFORM/arch-arm64/usr/lib -L/Users/sumn/third_party/ffmpeg-4.2.7/x264-master/android/arm64/lib -L$MIN_PLATFORM/arch-arm64/usr/lib -nostdlib"
+fi
 
 sed  -i "" "s/SLIBNAME_WITH_MAJOR='\$(SLIBNAME).\$(LIBMAJOR)'/SLIBNAME_WITH_MAJOR='\$(SLIBPREF)\$(FULLNAME)-\$(LIBMAJOR)\$(SLIBSUF)'/" configure
 sed  -i "" "s/LIB_INSTALL_EXTRA_CMD='\$\$(RANLIB) \"\$(LIBDIR)\\/\$(LIBNAME)\"'/LIB_INSTALL_EXTRA_CMD='\$\$(RANLIB) \"\$(LIBDIR)\\/\$(LIBNAME)\"'/" configure
